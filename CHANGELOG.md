@@ -3,6 +3,10 @@
 The weights are `nrs-edge 0.1.0`. They have not changed since the release: `nrs-edge.safetensors` has the SHA-256
 `aff7dfb82cbdba0cbfaa943bcbebc8a0583d276a3477317401e14a054054a254`.
 
+## 2026-11-25: version 0.1.1 is on PyPI
+
+`pip install nrs-edge` works: https://pypi.org/project/nrs-edge/. The files were built, tested and uploaded by `.github/workflows/publish.yml` from the tag `v0.1.1`, with PyPI trusted publishing (no token is stored). The README and the guide now use the short command.
+
 ## Repository update 2 (2026-11-25): Python package 0.1.1
 
 No change to the weights, the ONNX files, `infer.py`, the model card or any number.
@@ -14,7 +18,7 @@ Added:
 - The weights are downloaded from Hugging Face at one fixed revision on the first use, without login, and are checked by SHA-256.
 - `src/nrs_edge/_infer.py` is `infer.py` with one line replaced by a comment; the package runs the same code as the script. As a library it does not change `sys.path`, and it raises an error where the script ends the program.
 - The automatic Linux test now also installs the package with pip, runs `nrs-edge check` and runs `tests/package_behaviour.py` (picture formats, graph sizes, error handling) on x86-64 and ARM64.
-- `.github/workflows/publish.yml` for a later upload to PyPI. The package is not on PyPI yet.
+- `.github/workflows/publish.yml` for the upload to PyPI (done on the same day; see above).
 
 The package version 0.1.1 is the version of the code. The weights stay `nrs-edge 0.1.0`.
 

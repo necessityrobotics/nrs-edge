@@ -16,12 +16,12 @@ CAUTION: We have no speed number and no accuracy number from a Jetson. If you ru
 
 ## 1. Linux computer, CPU (x86-64 or ARM64)
 
-The quickest way is the Python package. It uses ONNX Runtime and needs no PyTorch (about 300 MB of disk space). You need Python 3.10 or newer, `git` and the venv module (on Ubuntu: `sudo apt install git python3-venv`):
+The quickest way is the Python package. It uses ONNX Runtime and needs no PyTorch (about 300 MB of disk space). You need Python 3.10 or newer and the venv module (on Ubuntu: `sudo apt install python3-venv`):
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install "git+https://github.com/necessityrobotics/nrs-edge"
+pip install nrs-edge
 nrs-edge check
 ```
 

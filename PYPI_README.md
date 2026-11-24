@@ -13,8 +13,6 @@ pip install nrs-edge
 nrs-edge check
 ```
 
-If pip does not find `nrs-edge`, the package is not on PyPI yet. Then use: `pip install "git+https://github.com/necessityrobotics/nrs-edge"` (this needs `git`).
-
 `nrs-edge check` downloads the weights (about 24 MB, no login, checked by SHA-256), runs three bundled pairs and compares the result with our reference. It must print `nrs-edge check: PASS`.
 
 ## Use
