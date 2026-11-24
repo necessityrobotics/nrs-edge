@@ -1,0 +1,8 @@
+# Install PyTorch first, from https://pytorch.org (CUDA or CPU build). Tested with torch 2.9.1.
+numpy>=1.24
+opencv-python>=4.8
+safetensors>=0.4
+# tested with timm 1.0.31 (FasterNet-T0 definition)
+timm>=1.0
+# only for the ONNX path; tested with onnxruntime 1.31.1
+onnxruntime>=1.18

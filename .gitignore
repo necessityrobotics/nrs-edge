@@ -1,0 +1,6 @@
+out/
+__pycache__/
+*.safetensors
+*.safetensors.sha256
+*.onnx
+*.onnx.sha256

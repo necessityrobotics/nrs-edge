@@ -1,0 +1,31 @@
+nrs-edge 0.1.0: stereo depth network by Necessity Robotics
+Copyright 2026 Necessity Robotics
+
+Weights and scripts of nrs-edge: Apache-2.0.
+
+The weights were trained by Necessity Robotics. No other group's model weights and no ImageNet weights were used.
+
+This release contains or is derived from these third-party works:
+
+* LiteAnyStereo (github.com/TomTomTommi/LiteAnyStereo, commit 8c97bd4): network design and code,
+  unmodified (third_party/LiteAnyStereo in the code repository). MIT License,
+  Copyright (c) 2025 Junpeng Jing.
+* PyTorch Image Models (timm, Apache-2.0; LICENSES/timm_Apache-2.0.txt): the FasterNet-T0 definition.
+* FasterNet (Microsoft Corporation, MIT License, as stated in the timm source).
+
+Citations (Lite Any Stereo v1 and v2, DLNR, RAFT-Stereo): see ATTRIBUTION.md.
+
+Training data (see ATTRIBUTION.md for pair counts, evidence and citations):
+  StereoGenBench: CC BY 4.0. Y. Cui, F. Qiao, N. Jacobs. StereoGenBench: A Synthetic Multi-Camera Benchmark for Stereo Generation under Controlled Baseline Regimes. arXiv:2605.23237, 2026
+  WMGStereo-150k: BSD-3-Clause. D. Yan, A. Raistrick, J. Deng. What Makes Good Synthetic Training Data for Zero-Shot Stereo Matching? CVPR 2026, pp. 34171-34180. arXiv:2504.16930. Generator: Copyright (c) 2025, Princeton Vision & Learning Lab, BSD 3-Clause
+  TartanAir V1: CC BY 4.0. W. Wang, D. Zhu, X. Wang, Y. Hu, Y. Qiu, C. Wang, Y. Hu, A. Kapoor, S. Scherer. TartanAir: A Dataset to Push the Limits of Visual SLAM. IEEE/RSJ IROS 2020
+  TartanAir V2: CC BY 4.0. TartanAir V2, Carnegie Mellon University (AirLab); W. Wang, Y. Hu, Y. Qiu, S. Shen, Y. Shaoul. https://tartanair.org/
+  TUM-VI: CC BY 4.0. D. Schubert, T. Goll, N. Demmel, V. Usenko, J. Stueckler, D. Cremers. The TUM VI Benchmark for Evaluating Visual-Inertial Odometry. IROS 2018. arXiv:1804.06120
+  Rosario v2: CC BY 4.0. N. Soncini, J. Cremona, E. Vidal, M. García, G. Castro, T. Pire. The Rosario dataset v2: Multi-modal dataset for agricultural robotics. The International Journal of Robotics Research, 2025. doi:10.1177/02783649251368909. CIFASIS
+  DrivingStereo: MIT. G. Yang, X. Song, C. Huang, Z. Deng, J. Shi, B. Zhou. DrivingStereo: A Large-Scale Dataset for Stereo Matching in Autonomous Driving Scenarios. CVPR 2019. MIT License, Copyright (c) 2019 drivingstereo-dataset
+  TartanRGBT: BSD-3-Clause-Clear. TartanRGBT dataset (huggingface.co/datasets/theairlabcmu/TartanRGBT). Cite: P. Maheshwari, J. Karhade, Y. Chawla, I. Adu, F. Heisen, A. Porco, A. Jong, Y. Liu, S. Pitla, S. Scherer, W. Wang. AnyThermal: Towards Learning Universal Representations for Thermal Perception. IEEE ICRA 2026. arXiv:2602.06203
+  DROID: CC BY 4.0. A. Khazatsky, K. Pertsch, S. Nair, et al. DROID: A Large-Scale In-The-Wild Robot Manipulation Dataset. Robotics: Science and Systems (RSS) 2024. doi:10.15607/RSS.2024.XX.120. arXiv:2403.12945
+  Unitree G1 head stereo: Apache-2.0. Unitree Robotics, Unitree G1 Dex1 / WBT teleoperation datasets on Hugging Face (huggingface.co/unitreerobotics; the 33 repositories are listed in ATTRIBUTION.md)
+  FoMo: CC BY 4.0. M. Boxan, G. Jeanson, A. Krawciw, E. Daum, X. Qiao, S. Lilge, T. D. Barfoot, F. Pomerleau. FoMo: A Multi-Season Dataset for Robot Navigation in Forêt Montmorency. arXiv:2603.08433, 2026. Copyright (c) 2026 Matej Boxan, Gabriel Jeanson, Alexander Krawciw, Effie Daum, Xinyuan Qiao, Sven Lilge, Timothy D. Barfoot, and Francois Pomerleau. https://registry.opendata.aws/fomo-norlab/
+  WMGStereo generator BSD-3-Clause text: LICENSES/WMGStereo_generator_BSD-3-Clause.txt
+  CC BY 4.0: https://creativecommons.org/licenses/by/4.0/
