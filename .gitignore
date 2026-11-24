@@ -1,6 +1,10 @@
 out/
+out_check/
+build_*/
+.venv/
 __pycache__/
 *.safetensors
 *.safetensors.sha256
 *.onnx
 *.onnx.sha256
+*.engine

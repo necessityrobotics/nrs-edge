@@ -8,6 +8,7 @@
 - **Weights download:** Hugging Face, [`Pyassahu/nrs-edge`](https://huggingface.co/Pyassahu/nrs-edge).
 - **Model card:** `MODEL_CARD.md` (every scored candidate, gates, training data, limits).
 - **Speed:** no Jetson speed was measured. Real-time use on a Jetson-class board is our aim, not a result.
+- **Platforms:** Windows and Linux (x86-64 and ARM64). The Linux install and both run paths are tested automatically on the CPU. For NVIDIA Jetson there is a guide and a TensorRT build script; they have not run on a device. See [`docs/LINUX_JETSON.md`](docs/LINUX_JETSON.md).
 
 ## Accuracy of these weights (our harness, FP32; lower is better)
 
@@ -46,10 +47,16 @@ You need Python 3.10 or newer.
    sha256sum -c nrs-edge_w640h400_fp32.onnx.sha256
    ```
 
-   On Windows (PowerShell), compare the printed hash with the `.sha256` file:
+   On Windows (PowerShell), this line must print `True`:
 
    ```powershell
-   Get-FileHash nrs-edge.safetensors -Algorithm SHA256
+   (Get-FileHash nrs-edge.safetensors -Algorithm SHA256).Hash -eq (Get-Content nrs-edge.safetensors.sha256).Split(' ')[0]
+   ```
+
+5. Check the install (optional). It runs the three example pairs through both paths and compares them with our reference. It must print `nrs-edge install check: PASS`:
+
+   ```bash
+   python tests/check_examples.py
    ```
 
 ## Run
@@ -66,6 +73,7 @@ ONNX Runtime (CPU):
 python infer.py --onnx nrs-edge_w640h400_fp32.onnx --left examples/pair_01_left.png --right examples/pair_01_right.png --out_dir out
 ```
 
+- A new run replaces the output files of the same picture in `--out_dir`. Use another `--out_dir` to keep an earlier result.
 - `--fx` is the rectified focal length in pixels and `--baseline` the baseline in metres. The values above are for the example pairs (our OAK-D Lite). Without them you get disparity only.
 - The ONNX graphs have fixed sizes: `w640h480` (480 x 640) and `w640h400` (400 x 640). A smaller pair is padded; a larger pair is resized, which loses detail. The `_fp16` graphs are for TensorRT FP16 (strongly typed) builds.
 
@@ -94,6 +102,11 @@ python infer.py --onnx nrs-edge_w640h400_fp32.onnx --left examples/pair_01_left.
 | `third_party/LiteAnyStereo/` | the authors' code, commit 8c97bd4, unmodified files (MIT) |
 | `examples/` | three rectified pairs from our own OAK-D Lite (640x400) |
 | `MODEL_CARD.md`, `ATTRIBUTION.md`, `NOTICE`, `LICENSE`, `LICENSES/` | card, credits, licence texts |
+| `docs/LINUX_JETSON.md` | commands for Linux and for NVIDIA Jetson; what is tested and what is not |
+| `tests/check_examples.py` | install check: both paths against our reference |
+| `device/` | device kit: `build_trt_jetson.sh` (TensorRT engine, timing, self-test on a Jetson), `selftest.py`, the reference data |
+| `.github/workflows/linux.yml` | the automatic Linux test (x86-64 and ARM64, CPU) |
+| `CHANGELOG.md` | what changed in this repository; the weights are unchanged |
 | `MANIFEST.sha256` | SHA-256 of every file in this folder |
 
 ## Citation and credits

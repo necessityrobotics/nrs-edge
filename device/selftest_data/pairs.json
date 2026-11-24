@@ -1,0 +1,110 @@
+{
+ "what": "nrs-edge device self-test pairs: rectified OAK-D Lite grayscale stereo, 640x400 PNG",
+ "camera": "OAK-D-LITE",
+ "calibration": "oakd_lite_eeprom.json",
+ "calibration_sha256": "ffb5143be103331b6f230b3445d2f8fafab1736360485ed5eebaf11d5aa74eee",
+ "calibration_captured": "2026-09-22T03:20:05.719375",
+ "left_socket": "CAM_B",
+ "right_socket": "CAM_C",
+ "resolution": [
+  640,
+  400
+ ],
+ "rectification": "cv2.stereoRectify(alpha=0, CALIB_ZERO_DISPARITY) + initUndistortRectifyMap, bilinear; opencv 5.0.0",
+ "distortion_coefficients_used": 14,
+ "epipolar_check": {
+  "14": {
+   "n_tracks": 5889,
+   "rectified_fx_px": 471.04923657209395,
+   "median_dy_px": 0.291839599609375,
+   "median_abs_dy_px": 0.2973785400390625,
+   "p90_abs_dy_px": 0.4785110354423523
+  },
+  "8": {
+   "n_tracks": 5819,
+   "rectified_fx_px": 472.77757761013686,
+   "median_dy_px": 0.4167022705078125,
+   "median_abs_dy_px": 0.4281005859375,
+   "p90_abs_dy_px": 1.1414062976837158
+  }
+ },
+ "rectified_fx_px": 471.04923657209395,
+ "rectified_cx_px": 330.97940826416016,
+ "rectified_cy_px": 189.68693351745605,
+ "baseline_m": 0.07514308655182726,
+ "P1": [
+  [
+   471.04923657209395,
+   0.0,
+   330.97940826416016,
+   0.0
+  ],
+  [
+   0.0,
+   471.04923657209395,
+   189.68693351745605,
+   0.0
+  ],
+  [
+   0.0,
+   0.0,
+   1.0,
+   0.0
+  ]
+ ],
+ "P2": [
+  [
+   471.04923657209395,
+   0.0,
+   330.97940826416016,
+   -35.39609355390901
+  ],
+  [
+   0.0,
+   471.04923657209395,
+   189.68693351745605,
+   0.0
+  ],
+  [
+   0.0,
+   0.0,
+   1.0,
+   0.0
+  ]
+ ],
+ "pairs": [
+  {
+   "id": "pair_01",
+   "left": "pair_01_left.png",
+   "right": "pair_01_right.png",
+   "recording": "oak_20260329_160543",
+   "frame": "001197",
+   "source_left_sha256": "58fa8226df9725b066dafc2b0155eb6841a7411b71a5dd91b116c37493350fc1",
+   "source_right_sha256": "97c2ee47813a8705096c9aba73795de2b285572c0ae03dfd5eb4a89f1c8e7569",
+   "left_sha256": "0fe8571f154714bd00510b2ec7060c168b21c6195a8d66ed4f2d6a3141e58a02",
+   "right_sha256": "872e2124c4e20585822baee4bf9e1c6e1872b6b756e572d78a817f0801c0a8cc"
+  },
+  {
+   "id": "pair_02",
+   "left": "pair_02_left.png",
+   "right": "pair_02_right.png",
+   "recording": "oak_20260329_160543",
+   "frame": "008383",
+   "source_left_sha256": "f0f6bb5696d136e717ecfe0c8f05fbe372435c71612265a8bca65685ca00ceaa",
+   "source_right_sha256": "aaca0a4aaed32fc198b890640b74a47eeb873ad20dc0caf6cdff1614fb397a78",
+   "left_sha256": "7919c52b37247890cc60092b9db350ccc7f51eeab33f497fc0c7adb24811d4d4",
+   "right_sha256": "ca6579e3a31c6ec683e050aaf65eee934c154286afc7c4f582db5d017e698775"
+  },
+  {
+   "id": "pair_03",
+   "left": "pair_03_left.png",
+   "right": "pair_03_right.png",
+   "recording": "oak_20260329_161206",
+   "frame": "003045",
+   "source_left_sha256": "d0210880f0983a3a523f45d7f222db56afc28b7443e58966b23f6a42f5ce75a0",
+   "source_right_sha256": "ddbb2a794f492798c3dc5d72b1d4e9ba8f7d712235342c6b8b0105dda1ec31ef",
+   "left_sha256": "86bbb9a30462d8965b362f90be8e7f7002013bc42df72ac891b56ae865ec534c",
+   "right_sha256": "bca54bfad80954100fb28512f735fdce6a0ae0cbdcd7cb1d5336ddc2fb5bfa94"
+  }
+ ]
+}

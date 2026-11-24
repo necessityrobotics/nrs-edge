@@ -1,0 +1,72 @@
+# Linux test (no GPU): the install steps of the README on x86-64 and ARM64, with the Python versions of the two
+# JetPack lines (3.10 and 3.12). It downloads the released weights, checks their hashes, runs both inference paths on
+# the 3 bundled pairs and compares the results with our stored FP32 reference. It also checks that the Jetson build
+# script stops cleanly on a machine without TensorRT. The results are posted as annotations, which anyone can read
+# without signing in.
+name: linux
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  install-and-run:
+    name: "README install + run (${{ matrix.os }}, Python ${{ matrix.python }})"
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
+        python: ["3.10", "3.12"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: System
+        run: |
+          uname -srm
+          python --version
+          sha256sum -c --quiet MANIFEST.sha256 && echo "MANIFEST.sha256: every file OK"
+      - name: Install PyTorch (CPU build) and the packages of requirements.txt
+        run: |
+          python -m pip install --upgrade pip
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -r requirements.txt
+          pip list | grep -i -E "^(torch|torchvision|timm|onnxruntime|numpy|opencv-python|safetensors) "
+      - name: Download the weights (no login) and check them
+        run: |
+          pip install huggingface_hub
+          hf download Pyassahu/nrs-edge nrs-edge.safetensors nrs-edge.safetensors.sha256 nrs-edge_w640h400_fp32.onnx nrs-edge_w640h400_fp32.onnx.sha256 nrs-edge_w640h400_fp16.onnx nrs-edge_w640h400_fp16.onnx.sha256 --local-dir .
+          sha256sum -c nrs-edge.safetensors.sha256
+          sha256sum -c nrs-edge_w640h400_fp32.onnx.sha256
+          sha256sum -c nrs-edge_w640h400_fp16.onnx.sha256
+      - name: README run commands
+        run: |
+          python infer.py --weights nrs-edge.safetensors --left examples/pair_01_left.png --right examples/pair_01_right.png --out_dir out --fx 471.049 --baseline 0.07514
+          python infer.py --onnx nrs-edge_w640h400_fp32.onnx --left examples/pair_01_left.png --right examples/pair_01_right.png --out_dir out
+      - name: Install check against our FP32 reference (PyTorch and ONNX Runtime)
+        run: python tests/check_examples.py
+      - name: Device self-test with the ONNX graph (CPU)
+        run: |
+          set +e
+          python device/selftest.py --onnx nrs-edge_w640h400_fp32.onnx --provider cpu > selftest.log 2>&1
+          rc=$?
+          cat selftest.log
+          python .github/annotate.py notice "device/selftest.py --onnx (${{ matrix.os }}, Python ${{ matrix.python }}), exit code $rc" selftest.log
+          exit "$rc"
+      - name: Jetson build script stops cleanly without TensorRT
+        run: |
+          bash -n device/build_trt_jetson.sh
+          set +e
+          bash device/build_trt_jetson.sh nrs-edge_w640h400_fp32.onnx > jetson_script.log 2>&1
+          rc=$?
+          cat jetson_script.log
+          python .github/annotate.py notice "device/build_trt_jetson.sh without TensorRT (${{ matrix.os }}), exit code $rc" jetson_script.log
+          # expected here: exit code 1 with the message "trtexec not found"
+          test "$rc" -eq 1 && grep -q "trtexec not found" jetson_script.log
