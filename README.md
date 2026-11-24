@@ -8,7 +8,7 @@
 - **Weights download:** Hugging Face, [`Pyassahu/nrs-edge`](https://huggingface.co/Pyassahu/nrs-edge).
 - **Model card:** `MODEL_CARD.md` (every scored candidate, gates, training data, limits).
 - **Speed:** no Jetson speed was measured. Real-time use on a Jetson-class board is our aim, not a result.
-- **Platforms:** Windows and Linux (x86-64 and ARM64). The Linux install and both run paths are tested automatically on the CPU. For NVIDIA Jetson there is a guide and a TensorRT build script; they have not run on a device. See [`docs/LINUX_JETSON.md`](docs/LINUX_JETSON.md).
+- **Platforms:** Windows (x86-64) and Linux (x86-64 and ARM64). The Linux install and both run paths are tested automatically on the CPU. For NVIDIA Jetson there is a guide and a TensorRT build script; they have not run on a device. See [`docs/LINUX_JETSON.md`](docs/LINUX_JETSON.md).
 
 ## Accuracy of these weights (our harness, FP32; lower is better)
 

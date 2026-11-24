@@ -69,7 +69,8 @@ jobs:
           python device/selftest.py --onnx nrs-edge_w640h400_fp32.onnx --provider cpu > selftest.log 2>&1
           rc=$?
           cat selftest.log
-          python .github/annotate.py notice "device/selftest.py --onnx (${{ matrix.os }}, Python ${{ matrix.python }}), exit code $rc" selftest.log
+          kind=notice; [ "$rc" -ne 0 ] && kind=error
+          python .github/annotate.py "$kind" "device/selftest.py --onnx (${{ matrix.os }}, Python ${{ matrix.python }}), exit code $rc" selftest.log
           exit "$rc"
       - name: Jetson build script stops cleanly without TensorRT
         run: |

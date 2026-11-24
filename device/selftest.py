@@ -2,7 +2,7 @@
 """nrs-edge device self-test: runs the 3 bundled rectified OAK-D Lite pairs through the shipped model and compares
 the disparity with our stored FP32 reference. Prints median / p99 / max |delta| (px) per pair and PASS or FAIL.
 
-  python3 selftest.py --engine nrs-edge_fp16.engine          # TensorRT engine (Jetson; build_trt_jetson.sh)
+  python3 selftest.py --engine build_nrs-edge_w640h400/nrs-edge_w640h400_fp16.engine   # TensorRT (build_trt_jetson.sh)
   python3 selftest.py --onnx nrs-edge_w640h400_fp32.onnx [--provider cpu|cuda|tensorrt|auto]
   python3 selftest.py --from_dir out/                         # pair_0N_disp.npy written by another runtime
                                                               # (640x400 float32)
@@ -21,7 +21,11 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from edge_io import Fit, abs_diff_stats, read_rgb, to_nchw  # noqa: E402
+try:
+    from edge_io import Fit, abs_diff_stats, read_rgb, to_nchw  # noqa: E402
+except ImportError as _e:                    # for example OpenCV (cv2) is missing: "could not run", not "FAIL"
+    print("nrs-edge self-test could not run: %s" % _e)
+    sys.exit(2)
 
 # ---------------- PASS / FAIL thresholds: |delta disparity| in px, device output vs our FP32 reference ----------------
 # Set for a TensorRT FP16 engine on the device. Every pair must meet both.
@@ -148,7 +152,7 @@ def main():
         print("  %s: |delta| median %s  p99 %s  max %s px  -> %s"
               % (p["id"], f(s["median_px"]), f(s["p99_px"]), f(s["max_px"]), "PASS" if ok else "FAIL"))
     verdict = "PASS" if ok_all else "FAIL"
-    print("SELFTEST %s%s" % (verdict, "" if man.get("release_reference") else "  (dry-run reference, not a release)"))
+    print("SELFTEST %s%s" % (verdict, "" if man.get("release_reference") else "  (test reference, not the reference of a release)"))
     if a.json:
         json.dump({"verdict": verdict, "pairs": results, "runtime": runner.describe() if runner else a.from_dir,
                    "reference_kind": man.get("KIND"), "thresholds": {"median": a.median_max, "p99": a.p99_max},

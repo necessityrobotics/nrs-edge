@@ -1,6 +1,6 @@
 """Model runners for the nrs-edge tools: ONNX Runtime and TensorRT (Python API). Same interface:
 
-    r = OrtRunner("nrs-edge.onnx", provider="cpu")     # or TrtRunner("nrs-edge_fp16.engine")
+    r = OrtRunner("nrs-edge_w640h400_fp32.onnx", provider="cpu")     # or TrtRunner("nrs-edge_w640h400_fp16.engine")
     r.input_hw                                          # (H, W) the graph takes
     disp = r.run(left_nchw, right_nchw)                 # float32 (H, W) disparity in pixels
     r.describe(); r.metadata                            # strings for logs; ONNX metadata (empty for an engine)

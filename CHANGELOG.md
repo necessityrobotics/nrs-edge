@@ -12,7 +12,7 @@ Added:
 - `docs/LINUX_JETSON.md`: commands for Linux (x86-64 and ARM64) and for NVIDIA Jetson, with a table of what is tested and what is not.
 - `.github/workflows/linux.yml`: an automatic test on Linux x86-64 and ARM64 (CPU, Python 3.10 and 3.12). It installs the packages as the README says, downloads the weights without login, checks the hashes, runs both inference paths and compares the result with our reference.
 - `tests/check_examples.py`: the same check for your own computer.
-- `device/`: the device kit. `build_trt_jetson.sh` builds a TensorRT FP16 engine on a Jetson, measures the speed and runs `selftest.py`, which compares the output with our FP32 reference (`device/selftest_data/`). The kit ran on our Windows desktop with TensorRT 11.4. It has not run on a Jetson.
+- `device/`: the device kit. `build_trt_jetson.sh` builds a TensorRT FP16 engine on a Jetson, measures the speed and runs `selftest.py`, which compares the output with our FP32 reference (`device/selftest_data/`). `selftest.py` and `runtimes.py` ran on our Windows desktop with a TensorRT 11.4 engine. `build_trt_jetson.sh` has not built an engine on any computer yet; on the Linux test computers it stops at "trtexec not found", as it must. We tested the logic of the script (order of the steps, fallback, exit codes) on the desktop with a stand-in for `trtexec`. Nothing has run on a Jetson.
 
 Changed in `README.md`:
 

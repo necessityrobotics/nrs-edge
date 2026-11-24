@@ -24,6 +24,8 @@ DURATION="${DURATION:-60}"
 PY="${PYTHON:-python3}"
 mkdir -p "$OUT"
 ENGINE="$OUT/${NAME}_fp16.engine"
+rm -f "$OUT/timing.txt" "$OUT/selftest.json" "$OUT/tegrastats.log" "$OUT/build_strongly_typed_failed.log" \n      "$OUT/compute.log" "$OUT/e2e.log"         # no result file of an earlier run stays in the folder
+ST_RC=0                                           # exit code of this script: the result of the self-test
 
 # ---- 1. the system, printed before anything else (no personal data: no hostname, IP, serial or user name) ----
 board=$( { tr -d '\0' < /proc/device-tree/model; } 2>/dev/null || true)
@@ -46,6 +48,9 @@ pmode=$(nvpmodel -q 2>/dev/null | tr -s '\n' ' ' || true)
 
 # ---- 2. trtexec ----
 TRTEXEC="${TRTEXEC:-}"
+if [ -n "$TRTEXEC" ] && [ ! -x "$TRTEXEC" ]; then
+  echo "trtexec not found: $TRTEXEC (from the TRTEXEC variable)"; exit 1
+fi
 if [ -z "$TRTEXEC" ]; then
   for c in /usr/src/tensorrt/bin/trtexec "$(command -v trtexec 2>/dev/null)"; do
     if [ -n "$c" ] && [ -x "$c" ]; then TRTEXEC="$c"; break; fi
@@ -117,9 +122,10 @@ if [ -z "${SKIP_TIMING:-}" ]; then
   trap '[ -n "$TPID" ] && kill "$TPID" 2>/dev/null' EXIT
   echo "== timing ${DURATION} s, compute only (CUDA graph, no transfers) ..."
   trt_run "$OUT/compute.log" --loadEngine="$ENGINE" --useCudaGraph --noDataTransfers \
-    --duration="$DURATION" --warmUp=5000 --percentile=50,90,99 || true
+    --duration="$DURATION" --warmUp=5000 --percentile=50,90,99 || echo "TIMING FAILED (compute only): see $OUT/compute.log"
   echo "== timing ${DURATION} s, end to end (with host<->device copies) ..."
-  trt_run "$OUT/e2e.log" --loadEngine="$ENGINE" --duration="$DURATION" --warmUp=5000 --percentile=50,90,99 || true
+  trt_run "$OUT/e2e.log" --loadEngine="$ENGINE" --duration="$DURATION" --warmUp=5000 --percentile=50,90,99 \
+    || echo "TIMING FAILED (end to end): see $OUT/e2e.log"
   [ -n "$TPID" ] && kill "$TPID" 2>/dev/null
   TPID=""
   {
@@ -134,11 +140,14 @@ fi
 if [ -z "${SKIP_SELFTEST:-}" ]; then
   if [ -n "$trt_py" ]; then
     "$PY" "$HERE/selftest.py" --engine "$ENGINE" --json "$OUT/selftest.json"
-    echo "self-test exit code: $?"
+    ST_RC=$?
+    echo "self-test exit code: $ST_RC (0 = PASS, 1 = FAIL, 2 = could not run)"
   else
     echo "self-test skipped: the tensorrt Python package is not importable with $PY."
+    ST_RC=2
     echo "Use the system Python of JetPack: PYTHON=/usr/bin/python3 bash $0 $ONNX"
     echo "Later, without a new build: /usr/bin/python3 $HERE/selftest.py --engine $ENGINE"
   fi
 fi
 echo "done; everything is in $OUT/"
+exit "$ST_RC"
