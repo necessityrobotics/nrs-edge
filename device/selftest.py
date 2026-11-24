@@ -21,6 +21,7 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
+sys.dont_write_bytecode = True                       # write nothing into this folder (no __pycache__)
 try:
     from edge_io import Fit, abs_diff_stats, read_rgb, to_nchw  # noqa: E402
 except ImportError as _e:                    # for example OpenCV (cv2) is missing: "could not run", not "FAIL"
