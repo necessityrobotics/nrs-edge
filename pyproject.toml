@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,11 +8,11 @@ version = "0.1.1"
 description = "nrs-edge: a small stereo depth network (6 M parameters). Disparity and metric depth from a rectified stereo pair."
 readme = "PYPI_README.md"
 requires-python = ">=3.10"
-license = { text = "Apache-2.0" }
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE", "ATTRIBUTION.md", "LICENSES/*"]
 authors = [{ name = "Necessity Robotics", email = "necessityrobotics@gmail.com" }]
 keywords = ["stereo", "depth", "disparity", "robotics", "onnx"]
 classifiers = [
-    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",
     "Operating System :: Microsoft :: Windows",
     "Operating System :: POSIX :: Linux",
@@ -26,7 +26,8 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# the PyTorch path (any picture size). torch and torchvision come from the same index, so they match.
+# The PyTorch path (any picture size). Install torch AND torchvision first, with the one command from pytorch.org:
+# a torchvision from another source than your torch does not match it.
 torch = ["torch", "torchvision", "timm>=1.0", "safetensors>=0.4"]
 
 [project.scripts]
@@ -39,7 +40,6 @@ Weights = "https://huggingface.co/Pyassahu/nrs-edge"
 
 [tool.setuptools]
 package-dir = { "" = "src" }
-license-files = ["LICENSE", "NOTICE", "ATTRIBUTION.md", "LICENSES/*"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

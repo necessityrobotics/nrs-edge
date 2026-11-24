@@ -8,7 +8,7 @@
   nrs-edge download [--all]                        get the weight files now; print where they are
   nrs-edge info                                    versions, links, limits
 
-The weights are downloaded on the first use (about 24 MB for the default graph), without login, and checked by SHA-256.
+The weights are downloaded on the first use (about 24 MB for one graph), without login, and checked by SHA-256.
 """
 import argparse
 import json
@@ -18,7 +18,7 @@ import sys
 import time
 
 from . import WEIGHTS_VERSION, __version__, _infer
-from .api import load
+from .api import auto_size, load
 from .weights import KINDS, fetch, files, table
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -26,39 +26,41 @@ DATA = os.path.join(HERE, "data")
 MEDIAN_MAX_PX = 0.05          # limits of `nrs-edge check`, for each pair: |disparity - reference|
 P99_MAX_PX = 0.5
 GITHUB = "https://github.com/necessityrobotics/nrs-edge"
+DOC = __doc__ or "The nrs-edge command.\n"
 
 
 def _add_model_args(p):
     p.add_argument("--backend", default="onnx", choices=["onnx", "torch"],
                    help='onnx (default; ONNX Runtime) or torch (needs: pip install "nrs-edge[torch]")')
     p.add_argument("--size", default="auto", choices=["auto", "400", "480"],
-                   help="ONNX graph: 640 x 400 or 640 x 480 (auto: the smallest that fits the picture)")
-    p.add_argument("--provider", default="cpu", choices=["cpu", "cuda", "tensorrt"], help="ONNX Runtime provider")
-    p.add_argument("--device", default="cpu", choices=["cpu", "cuda"], help="PyTorch device")
+                   help="onnx only. The graph: 640 x 400 or 640 x 480 (auto: the smallest that holds the picture)")
+    p.add_argument("--provider", default="cpu", choices=["cpu", "cuda", "tensorrt"], help="onnx only. ONNX Runtime provider")
+    p.add_argument("--device", default="cpu", choices=["cpu", "cuda"], help="torch only. PyTorch device")
     p.add_argument("--threads", type=int, default=0, help="CPU threads (0 = library default)")
 
 
-def _auto_size(h, w):
-    """The ONNX graph for a picture: the smallest graph that holds it; for a larger picture, the graph whose shape
-    (400 x 640 or 480 x 640) is nearer to the shape of the picture, because that picture is resized."""
-    if w <= 640 and h <= 400:
-        return 400
-    if w <= 640 and h <= 480:
-        return 480
-    return 400 if abs(h / w - 400 / 640) <= abs(h / w - 480 / 640) else 480
+def _note_unused(a):
+    """An option of the other backend does nothing: say so."""
+    if a.backend == "torch" and (getattr(a, "size", "auto") != "auto" or a.provider != "cpu"):
+        print("note: --size and --provider are for the onnx backend; they do nothing with --backend torch", file=sys.stderr)
+    if a.backend == "onnx" and a.device != "cpu":
+        print("note: --device is for the torch backend; with onnx, use --provider", file=sys.stderr)
 
 
 def cmd_run(a):
     if (a.fx is None) != (a.baseline is None):
-        sys.exit("--fx and --baseline go together")
+        sys.exit("nrs-edge: --fx and --baseline go together")
     import numpy as np
-    L, R = _infer.read_rgb(a.left), _infer.read_rgb(a.right)
-    if L.shape != R.shape:
-        sys.exit("left %s and right %s differ in size" % (L.shape, R.shape))
-    size = _auto_size(L.shape[0], L.shape[1]) if a.size == "auto" else int(a.size)
+    _note_unused(a)
     try:
+        L, R = _infer.read_rgb(a.left), _infer.read_rgb(a.right)
+        if L.shape != R.shape:
+            sys.exit("nrs-edge: left %s and right %s differ in size" % (L.shape, R.shape))
+        size = auto_size(L.shape[0], L.shape[1]) if a.size == "auto" else int(a.size)
         model = load(a.backend, size, a.provider, a.device, a.threads)
-    except (RuntimeError, ValueError, FileNotFoundError) as e:
+    except FileNotFoundError as e:
+        sys.exit("nrs-edge: file not found: %s" % e)
+    except Exception as e:                                    # one line for the user, not a traceback
         sys.exit("nrs-edge: %s" % e)
     print("model: %s; weights nrs-edge %s; package %s" % (model.description, WEIGHTS_VERSION, __version__))
     t0 = time.perf_counter()
@@ -76,7 +78,8 @@ def cmd_run(a):
 
 def cmd_check(a):
     import numpy as np
-    man = json.load(open(os.path.join(DATA, "reference", "manifest.json"), encoding="utf-8"))
+    with open(os.path.join(DATA, "reference", "manifest.json"), encoding="utf-8") as f:
+        man = json.load(f)
     print("nrs-edge check: package %s, weights nrs-edge %s, Python %s on %s %s" % (
         __version__, WEIGHTS_VERSION, platform.python_version(), platform.system(), platform.machine()))
     backends = ["onnx", "torch"] if a.backend == "both" else [a.backend]
@@ -86,6 +89,7 @@ def cmd_check(a):
             model = load(b, 400, a.provider, a.device, a.threads)
         except Exception as e:
             print("  %s: could not load: %s" % (b, e))
+            print("nrs-edge check: COULD NOT RUN")
             return 2
         print("  model: " + model.description)
         for p in man["pairs"]:
@@ -99,20 +103,24 @@ def cmd_check(a):
                 p["id"], med, p99, mx, "PASS" if ok else "FAIL"))
     print("nrs-edge check: %s (limits for each pair: median %.2f px, 99th percentile %.1f px)" % (
         "PASS" if ok_all else "FAIL", MEDIAN_MAX_PX, P99_MAX_PX))
+    print("  (the check uses three 640 x 400 pairs and the 640 x 400 graph: no padding and no resizing is checked)")
     return 0 if ok_all else 1
 
 
 def cmd_download(a):
-    names = files() if a.all else [KINDS.get(n, n) for n in (a.file or ["onnx400"])]
-    for n in names:
-        print(fetch(n))
+    names = files() if a.all else [KINDS.get(n, n) for n in (a.file or ["onnx400", "onnx480"])]
+    try:
+        for n in names:
+            print(fetch(n))                                    # paths on stdout, messages on stderr
+    except Exception as e:
+        sys.exit("nrs-edge: %s" % e)
     return 0
 
 
 def cmd_info(a):
     t = table()
     print("nrs-edge package %s; weights nrs-edge %s (Apache-2.0)" % (__version__, WEIGHTS_VERSION))
-    print("by Necessity Robotics; network design: Lite Any Stereo V2-S by Jing et al. (MIT code, unmodified)")
+    print("by Necessity Robotics; network design: Lite Any Stereo V2, size S, by Jing et al. (MIT code, unmodified)")
     print("code, model card, Linux and Jetson guide: " + GITHUB)
     print("weights: https://huggingface.co/%s (revision %s)" % (t["repo"], t["revision"][:12]))
     print("files: " + ", ".join("%s (%.0f MB)" % (n, v["bytes"] / 1e6) for n, v in sorted(t["files"].items())))
@@ -124,8 +132,9 @@ def cmd_info(a):
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(prog="nrs-edge", description=__doc__.split("\n")[0],
-                                 formatter_class=argparse.RawDescriptionHelpFormatter, epilog=__doc__.split("\n", 1)[1])
+    ap = argparse.ArgumentParser(prog="nrs-edge", description=DOC.split("\n")[0],
+                                 formatter_class=argparse.RawDescriptionHelpFormatter,
+                                 epilog=DOC.split("\n", 1)[1] if "\n" in DOC else None)
     ap.add_argument("--version", action="version", version="nrs-edge %s (weights nrs-edge %s)" % (__version__, WEIGHTS_VERSION))
     sub = ap.add_subparsers(dest="cmd", required=True)
     p = sub.add_parser("run", help="disparity (and depth) of one rectified stereo pair")
@@ -138,12 +147,12 @@ def main(argv=None):
     p.set_defaults(fn=cmd_run)
     p = sub.add_parser("check", help="run the 3 bundled pairs and compare with our reference")
     p.add_argument("--backend", default="onnx", choices=["onnx", "torch", "both"])
-    p.add_argument("--provider", default="cpu", choices=["cpu", "cuda", "tensorrt"])
-    p.add_argument("--device", default="cpu", choices=["cpu", "cuda"])
+    p.add_argument("--provider", default="cpu", choices=["cpu", "cuda", "tensorrt"], help="onnx only")
+    p.add_argument("--device", default="cpu", choices=["cpu", "cuda"], help="torch only")
     p.add_argument("--threads", type=int, default=0)
     p.set_defaults(fn=cmd_check)
     p = sub.add_parser("download", help="get weight files now and print their paths")
-    p.add_argument("file", nargs="*", help="file names or kinds (%s); default onnx400" % ", ".join(KINDS))
+    p.add_argument("file", nargs="*", help="file names or kinds (%s); default: both FP32 ONNX graphs" % ", ".join(KINDS))
     p.add_argument("--all", action="store_true", help="every released file")
     p.set_defaults(fn=cmd_download)
     p = sub.add_parser("info", help="versions, links, limits")

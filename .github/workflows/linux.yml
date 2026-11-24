@@ -126,8 +126,13 @@ jobs:
           pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
           pip install "nrs-edge[torch] @ git+https://github.com/${{ github.repository }}@${{ github.sha }}"
           cd "$RUNNER_TEMP"
-          nrs-edge check --backend both > "$GITHUB_WORKSPACE/pip_both.log" 2>&1
-          rc=$?
+          {
+            nrs-edge check --backend both
+            rc_a=$?
+            python "$GITHUB_WORKSPACE/tests/package_behaviour.py" "$GITHUB_WORKSPACE/examples" torch
+            rc_b=$?
+          } > "$GITHUB_WORKSPACE/pip_both.log" 2>&1
+          rc=$(( rc_a + rc_b ))
           cd "$GITHUB_WORKSPACE"
           cat pip_both.log
           kind=notice; [ "$rc" -ne 0 ] && kind=error

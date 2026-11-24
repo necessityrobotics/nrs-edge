@@ -16,7 +16,7 @@ CAUTION: We have no speed number and no accuracy number from a Jetson. If you ru
 
 ## 1. Linux computer, CPU (x86-64 or ARM64)
 
-The quickest way is the Python package. It uses ONNX Runtime and needs no PyTorch (about 300 MB of disk space):
+The quickest way is the Python package. It uses ONNX Runtime and needs no PyTorch (about 300 MB of disk space). You need Python 3.10 or newer, `git` and the venv module (on Ubuntu: `sudo apt install git python3-venv`):
 
 ```bash
 python3 -m venv .venv
@@ -67,7 +67,7 @@ Do section 1 first, with these changes.
   python infer.py --weights nrs-edge.safetensors --left examples/pair_01_left.png --right examples/pair_01_right.png --out_dir out --device cuda
   ```
 
-- **ONNX Runtime:** replace the CPU package with the GPU package. Then add `--provider cuda`:
+- **ONNX Runtime:** replace the CPU package with the GPU package. Then add `--provider cuda`. If you use the Python package (`pip install`), install it with `--no-deps` from then on: without it, pip installs the CPU `onnxruntime` again beside `onnxruntime-gpu`.
 
   ```bash
   pip uninstall -y onnxruntime

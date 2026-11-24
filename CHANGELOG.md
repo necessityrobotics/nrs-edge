@@ -12,8 +12,8 @@ Added:
 - `pyproject.toml` and `src/nrs_edge/`: a Python package. One command installs it: `pip install "git+https://github.com/necessityrobotics/nrs-edge"`. It gives the command `nrs-edge` (`check`, `run`, `download`, `info`) and the module `nrs_edge` (`nrs_edge.load()`).
 - The default path uses ONNX Runtime and needs no PyTorch. The PyTorch path is the extra `nrs-edge[torch]`.
 - The weights are downloaded from Hugging Face at one fixed revision on the first use, without login, and are checked by SHA-256.
-- `src/nrs_edge/_infer.py` is `infer.py` with one line removed; the package runs the same code as the script.
-- The automatic Linux test now also installs the package with pip and runs `nrs-edge check` (x86-64 and ARM64).
+- `src/nrs_edge/_infer.py` is `infer.py` with one line replaced by a comment; the package runs the same code as the script. As a library it does not change `sys.path`, and it raises an error where the script ends the program.
+- The automatic Linux test now also installs the package with pip, runs `nrs-edge check` and runs `tests/package_behaviour.py` (picture formats, graph sizes, error handling) on x86-64 and ARM64.
 - `.github/workflows/publish.yml` for a later upload to PyPI. The package is not on PyPI yet.
 
 The package version 0.1.1 is the version of the code. The weights stay `nrs-edge 0.1.0`.
