@@ -22,7 +22,23 @@
 
 The KITTI value is domain-exposed (driving images were in the training data). See `MODEL_CARD.md` for the protocol, all candidates and the gate results.
 
-## Install
+## Quick start (one command)
+
+```bash
+pip install "git+https://github.com/necessityrobotics/nrs-edge"
+nrs-edge check
+nrs-edge run --left left.png --right right.png --out_dir out --fx 471.049 --baseline 0.07514
+```
+
+- `nrs-edge check` downloads the weights (about 24 MB, no login, checked by SHA-256), runs the three bundled pairs and compares them with our reference. It must print `nrs-edge check: PASS`.
+- This path uses ONNX Runtime. It needs no PyTorch. Pictures up to 640 x 480 are padded; a larger picture is resized, which loses detail.
+- In Python: `import nrs_edge; disparity = nrs_edge.load()("left.png", "right.png")`.
+- For any picture size, add the PyTorch path: `pip install "nrs-edge[torch] @ git+https://github.com/necessityrobotics/nrs-edge"`, then `nrs-edge run --backend torch ...`.
+- The package is not on PyPI yet. When it is, the first line becomes `pip install nrs-edge`.
+
+## Install from a clone (the script `infer.py`)
+
+Use this path to read the code, to run the device kit, or to work without the Python package.
 
 You need Python 3.10 or newer.
 
@@ -102,6 +118,7 @@ python infer.py --onnx nrs-edge_w640h400_fp32.onnx --left examples/pair_01_left.
 | `third_party/LiteAnyStereo/` | the authors' code, commit 8c97bd4, unmodified files (MIT) |
 | `examples/` | three rectified pairs from our own OAK-D Lite (640x400) |
 | `MODEL_CARD.md`, `ATTRIBUTION.md`, `NOTICE`, `LICENSE`, `LICENSES/` | card, credits, licence texts |
+| `src/nrs_edge/`, `pyproject.toml` | the Python package: command `nrs-edge`, module `nrs_edge` (`_infer.py` is `infer.py` with one line removed; the weights are downloaded from Hugging Face) |
 | `docs/LINUX_JETSON.md` | commands for Linux and for NVIDIA Jetson; what is tested and what is not |
 | `tests/check_examples.py` | install check: both paths against our reference |
 | `device/` | device kit: `build_trt_jetson.sh` (TensorRT engine, timing, self-test on a Jetson), `selftest.py`, the reference data |

@@ -1,6 +1,9 @@
 out/
 out_check/
 build_*/
+build/
+dist/
+*.egg-info/
 .venv/
 __pycache__/
 *.safetensors

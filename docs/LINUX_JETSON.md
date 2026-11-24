@@ -16,6 +16,17 @@ CAUTION: We have no speed number and no accuracy number from a Jetson. If you ru
 
 ## 1. Linux computer, CPU (x86-64 or ARM64)
 
+The quickest way is the Python package. It uses ONNX Runtime and needs no PyTorch (about 300 MB of disk space):
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install "git+https://github.com/necessityrobotics/nrs-edge"
+nrs-edge check
+```
+
+`nrs-edge check` must print `nrs-edge check: PASS`. The rest of this section is the path with a clone of the repository. Use it for the PyTorch path, the script `infer.py` and the device kit.
+
 You need Python 3.10 or newer, `git`, and about 1 GB of disk space for the Python packages.
 
 Install PyTorch and torchvision with one command. A torchvision from another source does not match your PyTorch (section 4).

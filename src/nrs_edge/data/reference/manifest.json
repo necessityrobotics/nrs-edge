@@ -1,0 +1,60 @@
+{
+ "KIND": "trained checkpoint",
+ "release_reference": true,
+ "what": "nrs-edge self-test reference: PyTorch FP32 disparity (px) of the left image, 640x400, float32",
+ "model": {
+  "arch": "LAS2-S (LiteAnyStereo v2, size S)",
+  "max_disp": 192,
+  "las_commit_expected": "8c97bd4c4da3712c2ac60003a23201dfdb5935f4",
+  "torch": "2.9.1+cu130",
+  "timm": "1.0.31",
+  "kind": "trained checkpoint",
+  "checkpoint": "LAS2_S_final.pth",
+  "checkpoint_sha256": "13abd7b3981f9786dd398198ed25e3d1336f9d382b586e9c5cd1d0551b4f24b1",
+  "weights_fingerprint": "b8b8402ca978ec29f2a0ebd31a5ec46b083aa7234974fd2b34efb98749e6aede",
+  "params": 6040420
+ },
+ "device": "cpu",
+ "threads": 8,
+ "padding": "replicate to 640x416, centred (InputPadder sintel, divis_by=32), cropped back",
+ "pairs_json_sha256": "1758c6b92c92c256e7ae630ec9e2fd119c18d89ec18f881665bd8fcee0e42cdd",
+ "pairs": [
+  {
+   "id": "pair_01",
+   "file": "pair_01_disp.npy",
+   "shape": [
+    400,
+    640
+   ],
+   "min": 0.6486300826072693,
+   "median": 4.322227478027344,
+   "max": 10.702214241027832,
+   "s": 0.278
+  },
+  {
+   "id": "pair_02",
+   "file": "pair_02_disp.npy",
+   "shape": [
+    400,
+    640
+   ],
+   "min": 0.9369641542434692,
+   "median": 5.198296546936035,
+   "max": 14.207258224487305,
+   "s": 0.169
+  },
+  {
+   "id": "pair_03",
+   "file": "pair_03_disp.npy",
+   "shape": [
+    400,
+    640
+   ],
+   "min": 1.247544527053833,
+   "median": 7.93094539642334,
+   "max": 20.37409210205078,
+   "s": 0.176
+  }
+ ],
+ "created": "2026-11-24T22:38:00"
+}

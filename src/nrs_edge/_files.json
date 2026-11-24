@@ -1,0 +1,27 @@
+{
+ "repo": "Pyassahu/nrs-edge",
+ "revision": "8512822fdd9aa8926853371a31e375991d35111d",
+ "weights_version": "0.1.0",
+ "files": {
+  "nrs-edge.safetensors": {
+   "sha256": "aff7dfb82cbdba0cbfaa943bcbebc8a0583d276a3477317401e14a054054a254",
+   "bytes": 24282720
+  },
+  "nrs-edge_w640h400_fp16.onnx": {
+   "sha256": "2d26e7f9840c9615f989a7294fde2d8a8cdc33b8d79b59c5c10f1cd4c122f7d4",
+   "bytes": 12466974
+  },
+  "nrs-edge_w640h400_fp32.onnx": {
+   "sha256": "4a59dee6859f8e7499f2d88347e597bb448b9cc4995918fe837bfb346ab07fcf",
+   "bytes": 24408310
+  },
+  "nrs-edge_w640h480_fp16.onnx": {
+   "sha256": "3875321e1ac87d3e588d1fd3af20558d453b8e4565fc778f6be6c33d5dd0c541",
+   "bytes": 12417308
+  },
+  "nrs-edge_w640h480_fp32.onnx": {
+   "sha256": "4b52db5579e981bd0edfb3a43f7e7e1a4cb5c535b2ce6ba5d3337def41c1d2b6",
+   "bytes": 24378438
+  }
+ }
+}

@@ -3,6 +3,21 @@
 The weights are `nrs-edge 0.1.0`. They have not changed since the release: `nrs-edge.safetensors` has the SHA-256
 `aff7dfb82cbdba0cbfaa943bcbebc8a0583d276a3477317401e14a054054a254`.
 
+## Repository update 2 (2026-11-25): Python package 0.1.1
+
+No change to the weights, the ONNX files, `infer.py`, the model card or any number.
+
+Added:
+
+- `pyproject.toml` and `src/nrs_edge/`: a Python package. One command installs it: `pip install "git+https://github.com/necessityrobotics/nrs-edge"`. It gives the command `nrs-edge` (`check`, `run`, `download`, `info`) and the module `nrs_edge` (`nrs_edge.load()`).
+- The default path uses ONNX Runtime and needs no PyTorch. The PyTorch path is the extra `nrs-edge[torch]`.
+- The weights are downloaded from Hugging Face at one fixed revision on the first use, without login, and are checked by SHA-256.
+- `src/nrs_edge/_infer.py` is `infer.py` with one line removed; the package runs the same code as the script.
+- The automatic Linux test now also installs the package with pip and runs `nrs-edge check` (x86-64 and ARM64).
+- `.github/workflows/publish.yml` for a later upload to PyPI. The package is not on PyPI yet.
+
+The package version 0.1.1 is the version of the code. The weights stay `nrs-edge 0.1.0`.
+
 ## Repository update 1 (2026-11-25): Linux and Jetson
 
 No change to the weights, the ONNX files, `infer.py`, the model card or any number.

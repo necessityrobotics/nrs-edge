@@ -1,4 +1,4 @@
-# Linux test (no GPU): the install steps of the README on x86-64 and ARM64, with the Python versions of the two
+# Linux test (no GPU): the install steps of the README (the clone path and the pip package) on x86-64 and ARM64, with the Python versions of the two
 # JetPack lines (3.10 and 3.12). It downloads the released weights, checks their hashes, runs both inference paths on
 # the 3 bundled pairs and compares the results with our stored FP32 reference. It also checks that the Jetson build
 # script stops cleanly on a machine without TensorRT. The results are posted as annotations, which anyone can read
@@ -82,3 +82,54 @@ jobs:
           python .github/annotate.py notice "device/build_trt_jetson.sh without TensorRT (${{ matrix.os }}), exit code $rc" jetson_script.log
           # expected here: exit code 1 with the message "trtexec not found"
           test "$rc" -eq 1 && grep -q "trtexec not found" jetson_script.log
+
+  pip-package:
+    name: "pip install + nrs-edge check (${{ matrix.os }}, Python ${{ matrix.python }})"
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
+        python: ["3.10", "3.12"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: The one-command install of the README (from this commit; no PyTorch)
+        run: |
+          python -m pip install --upgrade pip
+          pip install "git+https://github.com/${{ github.repository }}@${{ github.sha }}"
+          pip list | grep -i -E "^(nrs-edge|onnxruntime|numpy|opencv-python|huggingface[-_]hub|torch) " || true
+      - name: nrs-edge check and nrs-edge run (ONNX Runtime; outside the source folder)
+        run: |
+          set +e
+          EX="$PWD/examples"
+          cd "$RUNNER_TEMP"
+          {
+            nrs-edge --version
+            nrs-edge check
+            rc1=$?
+            nrs-edge run --left "$EX/pair_01_left.png" --right "$EX/pair_01_right.png" --out_dir out --fx 471.049 --baseline 0.07514
+            rc2=$?
+            python -c "import nrs_edge, numpy as np; d = nrs_edge.load(quiet=True)('$EX/pair_01_left.png', '$EX/pair_01_right.png'); print('python interface: median disparity %.2f px' % float(np.median(d)))"
+            rc3=$?
+          } > "$GITHUB_WORKSPACE/pip_onnx.log" 2>&1
+          cd "$GITHUB_WORKSPACE"
+          cat pip_onnx.log
+          kind=notice; { [ "$rc1" -ne 0 ] || [ "$rc2" -ne 0 ] || [ "$rc3" -ne 0 ]; } && kind=error
+          python .github/annotate.py "$kind" "pip package, ONNX path (${{ matrix.os }}, Python ${{ matrix.python }}): exit codes $rc1 $rc2 $rc3" pip_onnx.log
+          [ "$kind" = notice ]
+      - name: The PyTorch extra, then nrs-edge check with both paths
+        run: |
+          set +e
+          pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+          pip install "nrs-edge[torch] @ git+https://github.com/${{ github.repository }}@${{ github.sha }}"
+          cd "$RUNNER_TEMP"
+          nrs-edge check --backend both > "$GITHUB_WORKSPACE/pip_both.log" 2>&1
+          rc=$?
+          cd "$GITHUB_WORKSPACE"
+          cat pip_both.log
+          kind=notice; [ "$rc" -ne 0 ] && kind=error
+          python .github/annotate.py "$kind" "pip package, both paths (${{ matrix.os }}, Python ${{ matrix.python }}): exit code $rc" pip_both.log
+          exit "$rc"
