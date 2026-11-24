@@ -48,8 +48,19 @@ jobs:
           sha256sum -c nrs-edge_w640h400_fp16.onnx.sha256
       - name: README run commands
         run: |
-          python infer.py --weights nrs-edge.safetensors --left examples/pair_01_left.png --right examples/pair_01_right.png --out_dir out --fx 471.049 --baseline 0.07514
-          python infer.py --onnx nrs-edge_w640h400_fp32.onnx --left examples/pair_01_left.png --right examples/pair_01_right.png --out_dir out
+          set +e
+          {
+            python infer.py --weights nrs-edge.safetensors --left examples/pair_01_left.png --right examples/pair_01_right.png --out_dir out --fx 471.049 --baseline 0.07514
+            rc1=$?
+            python infer.py --onnx nrs-edge_w640h400_fp32.onnx --left examples/pair_01_left.png --right examples/pair_01_right.png --out_dir out
+            rc2=$?
+          } > run.log 2>&1
+          cat run.log
+          if [ "$rc1" -ne 0 ] || [ "$rc2" -ne 0 ]; then
+            python .github/annotate.py error "README run commands (${{ matrix.os }}, Python ${{ matrix.python }}): exit codes $rc1 and $rc2" run.log
+            exit 1
+          fi
+          python .github/annotate.py notice "README run commands (${{ matrix.os }}, Python ${{ matrix.python }})" run.log
       - name: Install check against our FP32 reference (PyTorch and ONNX Runtime)
         run: python tests/check_examples.py
       - name: Device self-test with the ONNX graph (CPU)
