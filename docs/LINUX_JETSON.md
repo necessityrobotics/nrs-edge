@@ -23,7 +23,7 @@ git clone https://github.com/necessityrobotics/nrs-edge.git
 cd nrs-edge
 python3 -m venv .venv
 source .venv/bin/activate
-pip install torch --index-url https://download.pytorch.org/whl/cpu
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 pip install -r requirements.txt
 pip install huggingface_hub
 hf download Pyassahu/nrs-edge nrs-edge.safetensors nrs-edge.safetensors.sha256 nrs-edge_w640h400_fp32.onnx nrs-edge_w640h400_fp32.onnx.sha256 --local-dir .
@@ -154,7 +154,14 @@ print(float(np.median(disparity)))                         # 4.32 for this pair 
 depth_m = 471.049 * 0.07514 / np.maximum(disparity, 1e-6)  # focal length [px] x baseline [m] / disparity
 ```
 
-## 4. Limits
+## 4. Known problems
+
+| Message | Cause | What to do |
+|---|---|---|
+| `RuntimeError: operator torchvision::nms does not exist` | PyTorch and torchvision come from different sources and do not match. This happens when only `torch` was installed and another package then installed torchvision. | Install both again with one command, for example `pip install --force-reinstall torch torchvision --index-url https://download.pytorch.org/whl/cpu`. The ONNX path (`infer.py --onnx`) does not need PyTorch. |
+| `trtexec not found` | TensorRT is not installed, or `trtexec` is in another place. | On a Jetson, install the full JetPack, or give the path: `TRTEXEC=/path/to/trtexec bash device/build_trt_jetson.sh <model>`. |
+
+## 5. Limits
 
 - The limits of the model are in `MODEL_CARD.md`: at most 192 px of disparity, no confidence output, a rectified pair is needed.
 - The FP16 graphs were checked for accuracy on the CPU and, as a TensorRT engine, on one Windows desktop GPU. No accuracy result from a Jetson exists.

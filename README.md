@@ -26,7 +26,7 @@ The KITTI value is domain-exposed (driving images were in the training data). Se
 
 You need Python 3.10 or newer.
 
-1. Install PyTorch for your system from https://pytorch.org (CUDA or CPU build).
+1. Install PyTorch **and torchvision** for your system with the command from https://pytorch.org (CUDA or CPU build). Install both with that one command: `timm` needs torchvision, and a torchvision from another source does not match your PyTorch (error `operator torchvision::nms does not exist`).
 2. Install the other packages:
 
    ```bash

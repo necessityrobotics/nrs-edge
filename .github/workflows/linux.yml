@@ -33,10 +33,10 @@ jobs:
           uname -srm
           python --version
           sha256sum -c --quiet MANIFEST.sha256 && echo "MANIFEST.sha256: every file OK"
-      - name: Install PyTorch (CPU build) and the packages of requirements.txt
+      - name: Install PyTorch and torchvision (CPU build, one command) and the packages of requirements.txt
         run: |
           python -m pip install --upgrade pip
-          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
           pip install -r requirements.txt
           pip list | grep -i -E "^(torch|torchvision|timm|onnxruntime|numpy|opencv-python|safetensors) "
       - name: Download the weights (no login) and check them

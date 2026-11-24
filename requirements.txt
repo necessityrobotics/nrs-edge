@@ -1,4 +1,5 @@
-# Install PyTorch first, from https://pytorch.org (CUDA or CPU build). Tested with torch 2.9.1.
+# Install PyTorch AND torchvision first, with the one command from https://pytorch.org (CUDA or CPU build).
+# Tested with torch 2.9.1.
 numpy>=1.24
 opencv-python>=4.8
 safetensors>=0.4

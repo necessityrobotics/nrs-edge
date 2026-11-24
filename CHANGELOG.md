@@ -18,7 +18,10 @@ Changed in `README.md`:
 
 - a "Platforms" line and a link to the guide;
 - a one-line hash check for Windows;
-- a note that a new run replaces the output files of the same picture.
+- a note that a new run replaces the output files of the same picture;
+- the install step now says: install PyTorch and torchvision with one command. The first Linux test run showed that
+  a torchvision from another source does not match (error `operator torchvision::nms does not exist`). The ONNX path
+  was not affected.
 
 ## Release 0.1.0 (2026-11-25)
 
