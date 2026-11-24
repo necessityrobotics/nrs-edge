@@ -1,4 +1,5 @@
-# Publish the Python package to PyPI. It runs only when a GitHub release is published, or when it is started by hand.
+# Publish the Python package to PyPI. It runs only when a version tag (v*) is pushed, when a GitHub release is published,
+# or when it is started by hand. A push to a branch never starts it.
 # It uses PyPI "trusted publishing": no password and no token is stored in this repository. Before the first run, the
 # PyPI account that will manage the project must add a "pending publisher" on pypi.org:
 #   project name nrs-edge, owner necessityrobotics, repository nrs-edge, workflow publish.yml, environment pypi.
@@ -6,6 +7,8 @@
 name: publish
 
 on:
+  push:
+    tags: ["v*"]
   release:
     types: [published]
   workflow_dispatch:
@@ -22,12 +25,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: The release tag must be the version of the package
-        if: github.event_name == 'release'
+      - name: The tag must be the version of the package
+        if: github.event_name != 'workflow_dispatch'
         run: |
           v=$(grep -m1 '^version = ' pyproject.toml | cut -d'"' -f2)
-          echo "package version $v, tag ${{ github.event.release.tag_name }}"
-          test "v$v" = "${{ github.event.release.tag_name }}"
+          tag="${{ github.event.release.tag_name || github.ref_name }}"
+          echo "package version $v, tag $tag"
+          test "v$v" = "$tag"
       - name: Build
         run: |
           python -m pip install --upgrade pip build
